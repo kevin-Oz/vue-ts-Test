@@ -27,7 +27,6 @@
                   class="spinner-border text-success"
                   role="status"
                 >
-                  <span class="sr-only">Loading...</span>
                 </div>
               </div>
 
@@ -78,7 +77,7 @@
                                 v-model="task.name"
                               />
                               <div id="emailHelp" class="form-text">
-                                Enter the new task
+                                Change this task
                               </div>
                             </div>
                           </form>
@@ -132,7 +131,7 @@ export default defineComponent({
     };
   },
   methods: {
-    addTask() {
+    addTask(): void {
       const task = {
         name: this.task.name,
         status: this.task.status,
@@ -152,7 +151,7 @@ export default defineComponent({
       this.task.name = "";
     },
 
-    deleteTask(id: number) {
+    deleteTask(id: number) :void {
       this.loading = true;
       axios
         .delete("https://localhost:5001/api/Task/" + id)
@@ -166,7 +165,7 @@ export default defineComponent({
           this.loading = false;
         });
     },
-    updateTask(task: any, id: number) {
+    updateTask(task: any, id: number) :void {
       this.loading = true;
       axios
         .put("https://localhost:5001/api/Task/" + id, task)
@@ -176,7 +175,7 @@ export default defineComponent({
         })
         .catch(() => (this.loading = false));
     },
-    getTasks() {
+    getTasks():void {
       this.loading = true;
       axios
         .get("https://localhost:5001/api/Task")
@@ -188,7 +187,7 @@ export default defineComponent({
         .catch(() => (this.loading = false));
     },
   },
-  created() {
+  created() :void {
     this.getTasks();
   },
 });
