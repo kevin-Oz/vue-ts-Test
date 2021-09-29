@@ -15,7 +15,10 @@
                   placeholder="new task "
                 />
                 <div class="input-group-append">
-                  <button v-on:click="addTask()" class="btn btn-success btn-lg">
+                  <button
+                    v-on:click="addTask(task)"
+                    class="btn btn-success btn-lg"
+                  >
                     Add
                   </button>
                 </div>
@@ -26,8 +29,7 @@
                   v-if="loading"
                   class="spinner-border text-success"
                   role="status"
-                >
-                </div>
+                ></div>
               </div>
 
               <h5 v-if="listtasks.length == 0">You dont have any task</h5>
@@ -41,7 +43,7 @@
                     type="button"
                     class="btn btn-primary"
                     data-bs-toggle="modal"
-                    :data-bs-target="'#staticBackdrop'+ task.id"
+                    :data-bs-target="'#staticBackdrop' + task.id"
                   >
                     update
                   </button>
@@ -56,7 +58,7 @@
                   <!-- start modal -->
                   <div
                     class="modal fade"
-                    :id="'staticBackdrop'+ task.id"
+                    :id="'staticBackdrop' + task.id"
                     data-bs-backdrop="static"
                     data-bs-keyboard="false"
                     tabindex="-1"
@@ -116,79 +118,96 @@
 
 <script lang="ts">
 import axios from "axios";
-import { defineComponent } from "vue";
+import { defineComponent, onMounted, ref } from "vue";
+
+interface Task {
+  id: number;
+  name: string;
+  status: boolean;
+}
 
 export default defineComponent({
   name: "TaskComponent",
-  data() {
-    return {
-      task: {
-        name: "" as string,
-        status: false as boolean
-      },
-      listtasks: [],
-      loading: false as boolean,
+  setup() {
+
+    const task = {
+      name: "" as string,
+      status: false as boolean,
     };
-  },
-  methods: {
-    addTask(): void {
-      const task = {
-        name: this.task.name,
-        status: this.task.status,
-      };
-      this.loading = true;
+
+    const tasks = ref([]);
+    const loading = ref(false);
+
+    function getTasks(): void {
+      loading.value = true;
       axios
-        .post("https://localhost:5001/api/Task/", task)
+        .get("https://localhost:5001/api/Task")
+        .then((response) => {
+          //console.log(response);
+          tasks.value = response.data;
+          loading.value = false;
+        })
+        .catch(() => (loading.value = false));
+    }
+
+    function addTask(task: Task): void {
+      let newTask = {
+        name: task.name,
+        status: task.status,
+      };
+      loading.value = true;
+      axios
+        .post("https://localhost:5001/api/Task/", newTask)
         .then((response) => {
           console.log(response);
-          this.loading = false;
-          this.getTasks();
+          getTasks();
+          loading.value = false;
         })
         .catch((error) => {
           console.error(error);
-          this.loading = false;
+          loading.value = false;
         });
-      this.task.name = "";
-    },
+      task.name = "";
+    }
 
-    deleteTask(id: number) :void {
-      this.loading = true;
+    function deleteTask(id: number): void {
+      loading.value = true;
       axios
         .delete("https://localhost:5001/api/Task/" + id)
         .then((response) => {
           console.log(response);
-          this.getTasks();
-          this.loading = false;
+          getTasks();
+          loading.value = false;
         })
         .catch((error) => {
           console.log(error);
-          this.loading = false;
+          loading.value = false;
         });
-    },
-    updateTask(task: any, id: number) :void {
-      this.loading = true;
+    }
+
+    function updateTask(task: Task, id: number): void {
+      loading.value = true;
       axios
         .put("https://localhost:5001/api/Task/" + id, task)
         .then(() => {
-          this.getTasks();
-          this.loading = false;
+          getTasks();
+          loading.value = false;
         })
-        .catch(() => (this.loading = false));
-    },
-    getTasks():void {
-      this.loading = true;
-      axios
-        .get("https://localhost:5001/api/Task")
-        .then((response) => {
-          console.log(response);
-          this.listtasks = response.data;
-          this.loading = false;
-        })
-        .catch(() => (this.loading = false));
-    },
-  },
-  created() :void {
-    this.getTasks();
+        .catch(() => (loading.value = false));
+    }
+
+
+    onMounted(getTasks);
+
+
+    return {
+      listtasks: tasks,
+      loading: loading,
+      addTask: addTask,
+      deleteTask: deleteTask,
+      updateTask: updateTask,
+      task: task,
+    };
   },
 });
 </script>
