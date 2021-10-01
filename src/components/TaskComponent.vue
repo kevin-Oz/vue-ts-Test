@@ -141,7 +141,7 @@ export default defineComponent({
     function getTasks(): void {
       loading.value = true;
       axios
-        .get("https://localhost:5001/api/Task")
+        .get("http://dev.taskapi.com/api/Task")
         .then((response) => {
           //console.log(response);
           tasks.value = response.data;
@@ -157,7 +157,7 @@ export default defineComponent({
       };
       loading.value = true;
       axios
-        .post("https://localhost:5001/api/Task/", newTask)
+        .post("http://dev.taskapi.com/api/Task/", newTask)
         .then((response) => {
           console.log(response);
           getTasks();
@@ -173,7 +173,7 @@ export default defineComponent({
     function deleteTask(id: number): void {
       loading.value = true;
       axios
-        .delete("https://localhost:5001/api/Task/" + id)
+        .delete("http://dev.taskapi.com/api/Task/" + id)
         .then((response) => {
           console.log(response);
           getTasks();
@@ -188,7 +188,7 @@ export default defineComponent({
     function updateTask(task: Task, id: number): void {
       loading.value = true;
       axios
-        .put("https://localhost:5001/api/Task/" + id, task)
+        .put("http://dev.taskapi.com//api/Task/" + id, task)
         .then(() => {
           getTasks();
           loading.value = false;
