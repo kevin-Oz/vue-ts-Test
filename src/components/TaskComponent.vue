@@ -130,6 +130,7 @@ export default defineComponent({
   name: "TaskComponent",
   setup() {
 
+    const url = "http://dev.taskapi.com" as string;
     const task = {
       name: "" as string,
       status: false as boolean,
@@ -141,7 +142,7 @@ export default defineComponent({
     function getTasks(): void {
       loading.value = true;
       axios
-        .get("http://dev.taskapi.com/api/Task")
+        .get(`${url}/api/Task`)
         .then((response) => {
           //console.log(response);
           tasks.value = response.data;
@@ -154,10 +155,11 @@ export default defineComponent({
       let newTask = {
         name: task.name,
         status: task.status,
-      };
+      } as Task;
+
       loading.value = true;
       axios
-        .post("http://dev.taskapi.com/api/Task/", newTask)
+        .post(`${url}/api/Task`, newTask)
         .then((response) => {
           console.log(response);
           getTasks();
@@ -173,7 +175,7 @@ export default defineComponent({
     function deleteTask(id: number): void {
       loading.value = true;
       axios
-        .delete("http://dev.taskapi.com/api/Task/" + id)
+        .delete(`${url}/api/Task` + id)
         .then((response) => {
           console.log(response);
           getTasks();
@@ -188,7 +190,7 @@ export default defineComponent({
     function updateTask(task: Task, id: number): void {
       loading.value = true;
       axios
-        .put("http://dev.taskapi.com//api/Task/" + id, task)
+        .put(`${url}/api/Task` + id, task)
         .then(() => {
           getTasks();
           loading.value = false;
@@ -197,7 +199,9 @@ export default defineComponent({
     }
 
 
+    //loader
     onMounted(getTasks);
+
 
 
     return {
